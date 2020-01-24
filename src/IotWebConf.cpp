@@ -330,20 +330,7 @@ void IotWebConf::handleConfig()
     IotWebConfParameter* current = this->_firstParameter;
     while (current != NULL)
     {
-      if (current->getId() == NULL)
-      {
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
-        Serial.println("Rendering separator");
-#endif
-        page += "</fieldset><fieldset>";
-        if (current->label != NULL)
-        {
-          page += "<legend>";
-          page += current->label;
-          page += "</legend>";
-        }
-      }
-      else if (current->visible)
+      if (current->visible)
       {
 #ifdef IOTWEBCONF_DEBUG_TO_SERIAL
         Serial.print("Rendering ");
@@ -352,7 +339,7 @@ void IotWebConf::handleConfig()
 #endif
         String pitem = current->renderHtml(
           this->_server->hasArg(current->getId()),
-            this->_server->arg(current->getId()));
+          this->_server->arg(current->getId()));
 Serial.println(pitem);
         page += pitem;
       }

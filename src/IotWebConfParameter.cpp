@@ -203,3 +203,41 @@ IotWebConfSeparator::IotWebConfSeparator(const char* label)
   : IotWebConfParameter(label, NULL, NULL, 0)
 {
 }
+String IotWebConfSeparator::renderHtml(boolean hasValueFromPost, String valueFromPost)
+{
+  IotWebConfParameter* current = this;
+  String pitem = "</fieldset><fieldset>";
+  if (current->label != NULL)
+  {
+    pitem += "<legend>";
+    pitem += current->label;
+    pitem += "</legend>";
+  }
+  return pitem;
+}
+void IotWebConfSeparator::update(String newValue)
+{
+  // Does nothing.
+}
+IotWebConfSerializationData IotWebConfSeparator::serialize()
+{
+  // Does nothing.
+}
+IotWebConfSerializationData IotWebConfSeparator::prepareDeserialization()
+{
+  // Does nothing.
+}
+void IotWebConfSeparator::deserialize(IotWebConfSerializationData serializationData)
+{
+  // Does nothing.
+}
+void IotWebConfSeparator::debugToSerial()
+{
+  IotWebConfParameter* current = this;
+  Serial.print("--");
+  if (current->label != NULL)
+  {
+    Serial.print(current->label);
+  }
+  Serial.print("--");
+}

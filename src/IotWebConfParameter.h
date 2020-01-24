@@ -169,6 +169,7 @@ private:
 
 /**
  * A separator for separating field sets.
+ * NOTE: Separator will be replaced by a grouping ability of the parameters.
  */
 class IotWebConfSeparator : public IotWebConfParameter
 {
@@ -179,6 +180,13 @@ public:
    * Create a seperator with a label (legend tag)
    */
   IotWebConfSeparator(const char* label);
+
+  virtual String renderHtml(boolean hasValueFromPost, String valueFromPost) override;
+  virtual void update(String newValue) override;
+  virtual IotWebConfSerializationData serialize() override;
+  virtual IotWebConfSerializationData prepareDeserialization() override;
+  virtual void deserialize(IotWebConfSerializationData serializationData) override;
+  virtual void debugToSerial() override;
 };
 
 #endif

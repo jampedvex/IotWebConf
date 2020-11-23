@@ -182,7 +182,7 @@ boolean IotWebConf::configLoad()
         this->readEepromValue(start, serializationData.valueBuffer, serializationData.length);
         current->deserialize(serializationData);
 #ifdef IOTWEBCONF_DEBUG_TO_SERIAL
-        current->debugToSerial();
+        current->debugTo(&Serial);
         Serial.println();
 #endif
 
@@ -202,7 +202,7 @@ boolean IotWebConf::configLoad()
       {
         strncpy(current->valueBuffer, current->defaultValue, current->getLength());
 #ifdef IOTWEBCONF_DEBUG_TO_SERIAL
-        current->debugToSerial();
+        current->debugTo(&Serial);
         Serial.println();
 #endif
       }
@@ -234,7 +234,7 @@ void IotWebConf::configSave()
     if (current->getId() != NULL)
     {
 #ifdef IOTWEBCONF_DEBUG_TO_SERIAL
-      current->debugToSerial();
+      current->debugTo(&Serial);
       Serial.println();
 #endif
 
@@ -351,7 +351,7 @@ void IotWebConf::handleConfig()
       {
 #ifdef IOTWEBCONF_DEBUG_TO_SERIAL
         Serial.print("Rendering ");
-        current->debugToSerial();
+        current->debugTo(&Serial);
         Serial.println();
 #endif
         String pitem = current->renderHtml(
@@ -398,7 +398,7 @@ Serial.println(pitem);
         String newValue = this->_server->arg(current->getId());
         current->update(newValue);
 #ifdef IOTWEBCONF_DEBUG_TO_SERIAL
-        current->debugToSerial();
+        current->debugTo(&Serial);
         Serial.println();
 #endif
       }

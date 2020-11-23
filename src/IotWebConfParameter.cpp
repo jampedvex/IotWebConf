@@ -101,14 +101,14 @@ void IotWebConfTextParameter::deserialize(IotWebConfSerializationData serializat
 {
 }
 
-void IotWebConfTextParameter::debugToSerial()
+void IotWebConfTextParameter::debugTo(Stream* out)
 {
   IotWebConfParameter* current = this;
-  Serial.print("'");
-  Serial.print(current->getId());
-  Serial.print("' with value: '");
-  Serial.print(current->valueBuffer);
-  Serial.print("'");
+  out->print("'");
+  out->print(current->getId());
+  out->print("' with value: '");
+  out->print(current->valueBuffer);
+  out->print("'");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -149,18 +149,18 @@ String IotWebConfPasswordParameter::renderHtml(
   return IotWebConfTextParameter::renderHtml("password", true, String(""));
 }
 
-void IotWebConfPasswordParameter::debugToSerial()
+void IotWebConfPasswordParameter::debugTo(Stream* out)
 {
   IotWebConfParameter* current = this;
-  Serial.print("'");
-  Serial.print(current->getId());
-  Serial.print("' with value: ");
+  out->print("'");
+  out->print(current->getId());
+  out->print("' with value: ");
 #ifdef IOTWEBCONF_DEBUG_PWD_TO_SERIAL
-  Serial.print("'");
-  Serial.print(current->valueBuffer);
-  Serial.print("'");
+  out->print("'");
+  out->print(current->valueBuffer);
+  out->print("'");
 #else
-  Serial.print(F("<hidden>"));
+  out->print(F("<hidden>"));
 #endif
 }
 
@@ -226,7 +226,7 @@ String IotWebConfCheckboxParameter::renderHtml(
   }
   
   
-  return IotWebConfTextParameter::renderHtml("checkbox", true, IotWebConfCheckboxParameter::_selectedStr);
+  return IotWebConfTextParameter::renderHtml("checkbox", true, "selected");
 }
 
 void IotWebConfCheckboxParameter::update(String newValue)
@@ -366,13 +366,13 @@ void IotWebConfSeparator::deserialize(IotWebConfSerializationData serializationD
 {
   // Does nothing.
 }
-void IotWebConfSeparator::debugToSerial()
+void IotWebConfSeparator::debugTo(Stream* out)
 {
   IotWebConfParameter* current = this;
-  Serial.print("--");
+  out->print("--");
   if (current->label != NULL)
   {
-    Serial.print(current->label);
+    out->print(current->label);
   }
-  Serial.print("--");
+  out->print("--");
 }

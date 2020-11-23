@@ -18,7 +18,14 @@
 const char IOTWEBCONF_HTML_FORM_PARAM[] PROGMEM =
   "<div class='{s}'><label for='{i}'>{b}</label><input type='{t}' id='{i}' "
   "name='{i}' maxlength={l} placeholder='{p}' value='{v}' {c}/>"
-  "<div class='em'>{e}</div></div>";
+  "<div class='em'>{e}</div></div>\n";
+
+const char IOTWEBCONF_HTML_FORM_SELECT_PARAM[] PROGMEM =
+  "<div class='{s}'><label for='{i}'>{b}</label><select id='{i}' "
+  "name='{i}' {c}/>\n{o}"
+  "</select><div class='em'>{e}</div></div>\n";
+const char IOTWEBCONF_HTML_FORM_OPTION[] PROGMEM =
+  "<option value='{v}'{s}>{n}</option>\n";
 
 typedef struct IotWebConfSerializationData
 {
@@ -51,7 +58,7 @@ public:
     const char* label, const char* id, char* valueBuffer, int length,
     boolean visible = true, const char* defaultValue = NULL);
 
-  virtual String renderHtml(boolean hasValueFromPost, String valueFromPost);
+  virtual String renderHtml(boolean dataArrived, boolean hasValueFromPost, String valueFromPost);
   virtual void update(String newValue);
   virtual IotWebConfSerializationData serialize();
   virtual IotWebConfSerializationData prepareDeserialization();
@@ -112,7 +119,7 @@ public:
   const char* placeholder;
   const char* customHtml;
 
-  virtual String renderHtml(boolean hasValueFromPost, String valueFromPost) override;
+  virtual String renderHtml(boolean dataArrived, boolean hasValueFromPost, String valueFromPost) override;
   virtual void update(String newValue) override;
   virtual IotWebConfSerializationData serialize() override;
   virtual IotWebConfSerializationData prepareDeserialization() override;
@@ -138,7 +145,7 @@ public:
     const char* placeholder = NULL,
     const char* customHtml = NULL);
 
-  virtual String renderHtml(boolean hasValueFromPost, String valueFromPost) override;
+  virtual String renderHtml(boolean dataArrived, boolean hasValueFromPost, String valueFromPost) override;
   virtual void update(String newValue) override;
   virtual void debugToSerial() override;
 
@@ -158,10 +165,69 @@ public:
     const char* placeholder = NULL,
     const char* customHtml = NULL);
 
-  virtual String renderHtml(boolean hasValueFromPost, String valueFromPost) override;
+  virtual String renderHtml(boolean dataArrived, boolean hasValueFromPost, String valueFromPost) override;
 
 private:
   IotWebConfNumberParameter() {};
+  friend class IotWebConf;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class IotWebConfCheckboxParameter : public IotWebConfTextParameter
+{
+public:
+  IotWebConfCheckboxParameter(
+    const char* label, const char* id, char* valueBuffer, int length,
+    boolean visible = true, boolean defaultValue = false);
+
+  virtual String renderHtml(boolean dataArrived, boolean hasValueFromPost, String valueFromPost) override;
+  virtual void update(String newValue) override;
+
+  boolean isChecked() { return strncmp(this->valueBuffer, IotWebConfCheckboxParameter::_selectedStr, this->getLength()) == 0; }
+
+private:
+  IotWebConfCheckboxParameter() {};
+  friend class IotWebConf;
+  boolean _checked;
+  const char* _checkedStr = "checked='checked'";
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class IotWebConfOptionsParameter : public IotWebConfTextParameter
+{
+public:
+  IotWebConfOptionsParameter(
+    const char* label, const char* id, char* valueBuffer, int length,
+    const char* optionValues, const char* optionNames, size_t optionCount, size_t nameLength,
+    boolean visible = true, const char* defaultValue = NULL);
+
+protected:
+  IotWebConfOptionsParameter() {};
+  const char* _optionValues;
+  const char* _optionNames;
+  size_t _optionCount;
+  size_t _nameLength;
+
+private:
+  friend class IotWebConf;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class IotWebConfSelectParameter : public IotWebConfOptionsParameter
+{
+public:
+  IotWebConfSelectParameter(
+    const char* label, const char* id, char* valueBuffer, int length,
+    const char* optionValues, const char* optionNames, size_t optionCount, size_t namesLenth,
+    boolean visible = true, const char* defaultValue = NULL);
+
+  virtual String renderHtml(boolean dataArrived, boolean hasValueFromPost, String valueFromPost) override;
+
+private:
+  IotWebConfSelectParameter() {};
   friend class IotWebConf;
 };
 
@@ -181,7 +247,7 @@ public:
    */
   IotWebConfSeparator(const char* label);
 
-  virtual String renderHtml(boolean hasValueFromPost, String valueFromPost) override;
+  virtual String renderHtml(boolean dataArrived, boolean hasValueFromPost, String valueFromPost) override;
   virtual void update(String newValue) override;
   virtual IotWebConfSerializationData serialize() override;
   virtual IotWebConfSerializationData prepareDeserialization() override;

@@ -151,6 +151,8 @@ int IotWebConf::configInit()
     current = current->_nextParameter;
   }
 #ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+  Serial.print("Config version: ");
+  Serial.println(this->_configVersion);
   Serial.print("Config size: ");
   Serial.println(size);
 #endif
@@ -192,7 +194,21 @@ boolean IotWebConf::configLoad()
   }
   else
   {
-    IOTWEBCONF_DEBUG_LINE(F("Wrong config version."));
+    IOTWEBCONF_DEBUG_LINE(F("Wrong config version. Applying defaults."));
+    IotWebConfParameter* current = this->_firstParameter;
+    while (current != NULL)
+    {
+      if ((current->getId() != NULL) && (strlen(current->valueBuffer) == 0) && (current->defaultValue != NULL))
+      {
+        strncpy(current->valueBuffer, current->defaultValue, current->getLength());
+#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+        current->debugToSerial();
+        Serial.println();
+#endif
+      }
+      current = current->_nextParameter;
+    }
+
     return false;
   }
 
@@ -212,7 +228,7 @@ void IotWebConf::configSave()
   this->configSaveConfigVersion();
   IotWebConfParameter* current = this->_firstParameter;
   int start = IOTWEBCONF_CONFIG_START + IOTWEBCONF_CONFIG_VERSION_LENGTH;
-  IOTWEBCONF_DEBUG_LINE(F("Saving configurations"));
+  IOTWEBCONF_DEBUG_LINE(F("Saving configuration"));
   while (current != NULL)
   {
     if (current->getId() != NULL)
@@ -314,7 +330,8 @@ void IotWebConf::handleConfig()
     }
   }
 
-  if (!this->_server->hasArg("iotSave") || !this->validateForm())
+  boolean dataArrived = this->_server->hasArg("iotSave");
+  if (!dataArrived || !this->validateForm())
   {
     // -- Display config portal
     IOTWEBCONF_DEBUG_LINE(F("Configuration page requested."));
@@ -338,6 +355,7 @@ void IotWebConf::handleConfig()
         Serial.println();
 #endif
         String pitem = current->renderHtml(
+          dataArrived,
           this->_server->hasArg(current->getId()),
           this->_server->arg(current->getId()));
 Serial.println(pitem);
